@@ -75,7 +75,7 @@ norm = 'tanh_norm'
 train_data, val_data, test_data = MatchMaker.prepare_data(chem1, chem2, cell_line, synergies, norm,
                                             args.train_ind, args.val_ind, args.test_ind)
 
-
+#################################### TO PREPROCESS #################################### 
 
 # calculate weights for weighted MSE loss
 min_s = np.amin(train_data['y'])
@@ -105,6 +105,10 @@ if (args.train_test_mode == 1):
     # if we are in training mode
     model = MatchMaker.trainer(model, l_rate, train_data, val_data, max_epoch, batch_size,
                                 earlyStop_patience, modelName,loss_weight)
+
+
+
+#################################### TO TRAIN #################################### 
 # load the best model
 model.load_weights(modelName)
 
@@ -125,7 +129,7 @@ spearman_value = performance_metrics.spearman(test_data['y'], pred)
 pearson_value = performance_metrics.pearson(test_data['y'], pred)
 
 
-
+#################################### TO INFER #################################### 
 
 print(test_data['drug1'].shape)
 print(test_data['drug1'].shape)
