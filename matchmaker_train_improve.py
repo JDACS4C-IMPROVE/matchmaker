@@ -148,7 +148,6 @@ def run(params):
     layers['DSN_1'] = architecture['DSN_1'][0] # layers of Drug Synergy Network 1
     layers['DSN_2'] = architecture['DSN_2'][0] # layers of Drug Synergy Network 2
     layers['SPN'] = architecture['SPN'][0] # layers of Synergy Prediction Network
-    modelName = params["saved_model_name"] # name of the model to save the weights
 
     model = MatchMaker.generate_network(train_data, layers, params["inDrop"], params["drop"])
 
@@ -156,7 +155,7 @@ def run(params):
     # Train. Iterate over epochs.
     # -----------------------------
     model = MatchMaker.trainer(model, params["l_rate"], train_data, val_data, params["max_epoch"], params["this_batch_size"],
-                                params["earlyStop_patience"], params["modelName"], params["loss_weight"])
+                                params["earlyStop_patience"], params["model_name"], params["loss_weight"])
 
     # -----------------------------
     # Save model
