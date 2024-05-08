@@ -32,10 +32,8 @@ from improve import framework as frm
 from improve import drug_resp_pred as drp
 
 # Model-specific imports
-from model_utils.torch_utils import TestbedDataset
-from model_utils.utils import gene_selection, scale_df
-from model_utils.rdkit_utils import build_graph_dict_from_smiles_collection
-from model_utils.np_utils import compose_data_arrays
+import os
+import MatchMaker
 
 filepath = Path(__file__).resolve().parent # [Req]
 
