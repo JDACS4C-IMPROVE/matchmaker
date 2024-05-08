@@ -104,7 +104,7 @@ model_preproc_params = [
     },
     {"name": "arch",
      "type": str,
-     "default": "data/test_inds.txt",
+     "default": "data/architecture.txt",
      "help": "Architecute file to construct MatchMaker layers",
     },
     {"name": "gpu-support",

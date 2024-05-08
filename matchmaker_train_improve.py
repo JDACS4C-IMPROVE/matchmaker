@@ -141,7 +141,7 @@ def run(params):
     loss_weight = np.log(train_data['y'] - min_s + np.e)
 
     # load architecture file
-    architecture = pd.read_csv('architecture.txt')
+    architecture = pd.read_csv(params["arch"])
 
     # prepare layers of the model and the model name
     layers = {}
