@@ -155,7 +155,7 @@ def run(params):
     # Train. Iterate over epochs.
     # -----------------------------
     model = MatchMaker.trainer(model, params["l_rate"], train_data, val_data, params["max_epoch"], params["this_batch_size"],
-                                params["earlyStop_patience"], params["model_name"], params["loss_weight"])
+                                params["earlyStop_patience"], params["model_name"], loss_weight)
 
     # -----------------------------
     # Save model
