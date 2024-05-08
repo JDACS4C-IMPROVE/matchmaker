@@ -34,6 +34,7 @@ from improve import drug_resp_pred as drp
 # Model-specific imports
 import os
 import MatchMaker
+import pickle
 
 filepath = Path(__file__).resolve().parent # [Req]
 
@@ -210,9 +211,15 @@ def run(params: Dict):
     # All models must load response data (y data) using DrugResponseLoader().
     # Below, we iterate over the 3 split files (train, val, test) and load
     # response data, filtered by the split ids from the split files.
-    train_data.to_csv("train_data.csv", index=False)
-    val_data.to_csv("val_data.csv", index=False)
-    test_data.to_csv("test_data.csv", index=False)
+
+    with open("train_data.pkl", wb+) as f:
+        pickle.dump(train_data, f)
+
+    with open("val_data.pkl", wb+) as f:
+        pickle.dump(val_data, f)
+    
+    with open("test_data.pkl", wb+) as f:
+        pickle.dump(test_data, f)
    
 
     return params["ml_data_outdir"]
