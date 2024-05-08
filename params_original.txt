@@ -1,2 +1,4 @@
 # params_original.txt
 
+model_name = "matchmaker"
+
