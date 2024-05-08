@@ -1,4 +1,11 @@
-# params_original.txt
-
+[Global_Params]
 model_name = "matchmaker"
+
+[Preprocess]
+
+
+[Train]
+
+
+[Infer]
 
