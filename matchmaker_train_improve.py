@@ -32,7 +32,6 @@ import pandas as pd
 # [Req] IMPROVE/CANDLE imports
 from improve import framework as frm
 from improve.metrics import compute_metrics
-from candle import CandleCkptPyTorch
 
 # Model-specific imports
 import os
