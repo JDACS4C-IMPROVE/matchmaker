@@ -1,4 +1,4 @@
-""" Train GraphDRP for drug response prediction.
+""" Train Matchmaker for drug response prediction.
 
 Required outputs
 ----------------
@@ -8,8 +8,6 @@ All the outputs from this train script are saved in params["model_outdir"].
    The model is trained with train data and validated with val data. The model
    file name and file format are specified, respectively by
    params["model_file_name"] and params["model_file_format"].
-   For GraphDRP, the saved model:
-        model.pt
 
 2. Predictions on val data. 
    Raw model predictions calcualted using the trained model on val data. The
@@ -199,9 +197,6 @@ def initialize_parameters():
     additional_definitions = preprocess_params + train_params
     params = frm.initialize_parameters(
         filepath,
-        # default_model="graphdrp_default_model.txt",
-        # default_model="graphdrp_params.txt",
-        # default_model="params_ws.txt",
         default_model="params_original.txt",
         additional_definitions=additional_definitions,
         # required=req_train_args,

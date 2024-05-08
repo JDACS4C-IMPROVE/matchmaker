@@ -1,4 +1,4 @@
-""" Inference with GraphDRP for drug response prediction.
+""" Inference with Matchmaker for drug response prediction.
 
 Required outputs
 ----------------
@@ -83,25 +83,17 @@ def run(params):
     # ------------------------------------------------------
     test_data_fname = frm.build_ml_data_name(params, stage="test")
 
-    # GraphDRP -- remove data_format
-    test_data_fname = test_data_fname.split(params["data_format"])[0]
 
     # ------------------------------------------------------
     # Prepare dataloaders to load model input data (ML data)
     # ------------------------------------------------------
-    print("\nTest data:")
-    print(f"test_ml_data_dir: {params['test_ml_data_dir']}")
-    print(f"test_batch: {params['test_batch']}")
-    test_loader = build_GraphDRP_dataloader(params["test_ml_data_dir"],
-                                            test_data_fname,
-                                            params["test_batch"],
-                                            shuffle=False)
+    with open("test_data.pkl", 'rb') as f:
+        test_data = pickle.load(f)
 
     # ------------------------------------------------------
     # CUDA/CPU device
     # ------------------------------------------------------
     # Determine CUDA/CPU device and configure CUDA device if available
- ####  
     os.environ["CUDA_VISIBLE_DEVICES"] = params["gpu_devices"]
     if params["gpu_support"]:
         num_GPU = 1
@@ -118,8 +110,6 @@ def run(params):
                         )
 
     tf.compat.v1.keras.backend.set_session(tf.compat.v1.Session(config=config))
-
-####
 
     # ------------------------------------------------------
     # Load best model and compute predictions
@@ -138,8 +128,6 @@ def run(params):
     test_pred = (pred1 + pred2) / 2
     test_true = test_data['y']
     ############ from model
-
-    # Compute predictions
 
 
     # ------------------------------------------------------
@@ -169,9 +157,6 @@ def main(args):
     additional_definitions = preprocess_params + train_params + infer_params
     params = frm.initialize_parameters(
         filepath,
-        # default_model="graphdrp_default_model.txt",
-        # default_model="graphdrp_params.txt",
-        # default_model="params_ws.txt",
         default_model="params_original.txt",
         additional_definitions=additional_definitions,
         # required=req_infer_args,

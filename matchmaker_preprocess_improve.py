@@ -1,5 +1,5 @@
-""" Preprocess benchmark data (e.g., CSA data) to generate datasets for the
-GraphDRP prediction model.
+""" Preprocess original data to generate datasets for the
+Matchmaker prediction model.
 
 Required outputs
 ----------------
@@ -10,13 +10,8 @@ All the outputs from this preprocessing script are saved in params["ml_data_outd
    and test data. These data files are used as inputs to the ML/DL model in
    the train and infer scripts. The file format is specified by
    params["data_format"].
-   For GraphDRP, the generated files:
-        train_data.pt, val_data.pt, test_data.pt
 
-2. Y data files.
-   The script creates dataframes with true y values and additional metadata.
-   Generated files:
-        train_y_data.csv, val_y_data.csv, and test_y_data.csv.
+2. Y data files are not generated seperately for the original data
 """
 
 import sys
@@ -231,9 +226,6 @@ def main(args):
     additional_definitions = preprocess_params
     params = frm.initialize_parameters(
         filepath,
-        # default_model="graphdrp_default_model.txt",
-        # default_model="graphdrp_params.txt",
-        # default_model="params_ws.txt",
         default_model="params_original.txt",
         additional_definitions=additional_definitions,
         required=None,
