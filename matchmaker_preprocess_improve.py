@@ -212,13 +212,13 @@ def run(params: Dict):
     # Below, we iterate over the 3 split files (train, val, test) and load
     # response data, filtered by the split ids from the split files.
 
-    with open("train_data.pkl", wb+) as f:
+    with open("train_data.pkl", 'wb+') as f:
         pickle.dump(train_data, f)
 
-    with open("val_data.pkl", wb+) as f:
+    with open("val_data.pkl", 'wb+') as f:
         pickle.dump(val_data, f)
     
-    with open("test_data.pkl", wb+) as f:
+    with open("test_data.pkl", 'wb+') as f:
         pickle.dump(test_data, f)
    
 
