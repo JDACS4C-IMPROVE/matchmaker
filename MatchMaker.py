@@ -5,7 +5,7 @@ from tensorflow import keras
 from tensorflow.keras.models import Model
 from tensorflow.keras.layers import Dense, Dropout, Input, concatenate, BatchNormalization, Activation
 from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint
-from helper_funcs import normalize, progress
+from helper_funcs import normalize
 
 
 def data_loader(drug1_chemicals,drug2_chemicals,cell_line_gex,comb_data_name):
