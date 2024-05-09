@@ -5,8 +5,7 @@ model_name = "matchmaker"
 
 [Train]
 model_file_format = ".keras"
-#epochs = 1000
-epochs = 3
+epochs = 1000
 batch_size = 128
 patience = 100
 

@@ -1,6 +1,9 @@
 # IMPROVE - MatchMaker: Drug Synergy Prediction
 
 ---
+
+This is the IMPROVE implementation of the original model with original data.
+
 ## Dependencies and Installation
 ### Conda Environment
 ```
