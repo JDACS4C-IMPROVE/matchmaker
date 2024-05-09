@@ -29,7 +29,7 @@ import numpy as np
 import tensorflow as tf
 import MatchMaker
 import pickle
-import keras
+import tensorflow.keras as keras
 
 # [Req] Imports from preprocess and train scripts
 from matchmaker_preprocess_improve import preprocess_params
