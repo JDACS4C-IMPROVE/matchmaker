@@ -29,6 +29,7 @@ import numpy as np
 import tensorflow as tf
 import MatchMaker
 import pickle
+import keras
 
 # [Req] Imports from preprocess and train scripts
 from matchmaker_preprocess_improve import preprocess_params
@@ -120,7 +121,7 @@ def run(params):
     ##########################
     # load the best model
     #model.load_weights(modelName)
-    model = tf.compat.v1.saved_model.load(str(modelpath))
+    model = keras.models.load_model(str(modelpath))
     # predict in Drug1, Drug2 order
     pred1 = MatchMaker.predict(model, [test_data['drug1'],test_data['drug2']])
     # predict in Drug2, Drug1 order
