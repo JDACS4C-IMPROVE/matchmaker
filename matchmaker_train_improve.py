@@ -158,7 +158,7 @@ def run(params):
     # -----------------------------
     # Save model
     # -----------------------------
-    model.save(modelpath)
+    model.save(str(modelpath))
 
     # ------------------------------------------------------
     # Load best model and compute predictions
