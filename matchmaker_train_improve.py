@@ -36,6 +36,7 @@ import os
 import tensorflow as tf
 import MatchMaker
 import pickle
+import keras
 
 # [Req] Imports from preprocess script
 from matchmaker_preprocess_improve import preprocess_params

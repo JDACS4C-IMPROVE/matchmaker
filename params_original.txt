@@ -5,7 +5,7 @@ model_name = "matchmaker"
 max_epoch = 3
 
 [Train]
-
+model_file_format = ".keras"
 
 [Infer]
 
