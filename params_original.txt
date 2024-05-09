@@ -2,11 +2,11 @@
 model_name = "matchmaker"
 
 [Preprocess]
-max_epoch = 3
 
 [Train]
 model_file_format = ".keras"
-epochs = 1000
+#epochs = 1000
+epochs = 3
 batch_size = 128
 patience = 100
 
