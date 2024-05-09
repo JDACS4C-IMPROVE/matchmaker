@@ -120,7 +120,7 @@ def run(params):
     ##########################
     # load the best model
     #model.load_weights(modelName)
-    model = tf.compat.v1.saved_model.load(modelpath)
+    model = tf.compat.v1.saved_model.load(str(modelpath))
     # predict in Drug1, Drug2 order
     pred1 = MatchMaker.predict(model, [test_data['drug1'],test_data['drug2']])
     # predict in Drug2, Drug1 order
