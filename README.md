@@ -1,4 +1,4 @@
-# IMPROVE - MatchMaker: A Deep Learning Framework for Drug Synergy Prediction
+# IMPROVE - MatchMaker: Drug Synergy Prediction
 
 ---
 ## Dependencies and Installation
@@ -53,4 +53,5 @@ python matchmaker/matchmaker_infer_improve.py
 
 ## References
 Original GitHub: https://github.com/tastanlab/matchmaker
+
 Original paper: https://pubmed.ncbi.nlm.nih.gov/34086576/
