@@ -28,6 +28,7 @@ import os
 import numpy as np
 import tensorflow as tf
 import MatchMaker
+import pickle
 
 # [Req] Imports from preprocess and train scripts
 from matchmaker_preprocess_improve import preprocess_params
