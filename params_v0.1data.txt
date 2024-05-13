@@ -1,0 +1,18 @@
+[Global_Params]
+model_name = "matchmaker"
+
+[Preprocess]
+train_split_file = "all_split_0_train.txt"
+val_split_file = "all_split_0_val.txt"
+test_split_file = "all_split_0_test.txt"
+data_format = ".pkl"
+y_col_name = "loewe"
+
+[Train]
+model_file_format = ".keras"
+epochs = 1000
+batch_size = 128
+patience = 100
+
+[Infer]
+

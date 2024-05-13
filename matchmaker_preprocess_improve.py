@@ -57,45 +57,10 @@ app_preproc_params = []
 # All params in model_preproc_params are optional.
 # If no params are required by the model, then it should be an empty list.
 model_preproc_params = [
-    {"name": "comb-data-name",
-     "type": str,
-     "default": 'data/DrugCombinationData.tsv',
-     "help": "Name of the drug combination data",
-    },
-    {"name": "cell_line-gex",
-     "type": str,
-     "default": 'data/cell_line_gex.csv',
-     "help": "Name of the cell line gene expression data",
-    },
-    {"name": "drug1-chemicals",
-     "type": str,
-     "default": "data/drug1_chem.csv",
-     "help": "Name of the chemical features data for drug 1",
-    },
-    {"name": "drug2-chemicals",
-     "type": str,
-     "default": "data/drug2_chem.csv",
-     "help": "Name of the chemical features data for drug 2",
-    },
     {"name": "gpu-devices",
      "type": str,
      "default": "0",
      "help": "gpu device ids for CUDA_VISIBLE_DEVICES",
-    },
-    {"name": "train-ind",
-     "type": str,
-     "default": "data/train_inds.txt",
-     "help": "Data indices that will be used for training",
-    },
-    {"name": "val-ind",
-     "type": str,
-     "default": "data/val_inds.txt",
-     "help": "Data indices that will be used for validation",
-    },
-    {"name": "test-ind",
-     "type": str,
-     "default": "data/test_inds.txt",
-     "help": "Data indices that will be used for test",
     },
     {"name": "arch",
      "type": str,
@@ -173,13 +138,40 @@ def run(params: Dict):
     # data, then the model must use the provided data loaders to load the data files
     # from the x_data dir.
    # load and process data
-    chem1, chem2, cell_line, synergies = MatchMaker.data_loader(params["drug1_chemicals"], params["drug2_chemicals"],
-                                                params["cell_line_gex"], params["comb_data_name"])
+    
+
+    print("File reading ...")
+ 
+
+    # need to make this work for all feature types
+    # read data
+    y_data = pd.read_csv("y_data/synergy.tsv", sep="\t")
+    cell_feature = pd.read_csv("x_data/transcriptomics_L1000.tsv", sep="\t")
+    drug_feature = pd.read_csv("x_data/drug_mordred.tsv", sep="\t", index_col="DrugID")
+
+    # cell features
+    y_data_cell = y_data.join(cell_feature, on="DepMapID", how="left")
+    cell_indexed = y_data_cell.iloc[:,10:]
+
+    # drug features
+    y_data_drug1 = y_data.join(drug_feature, on="DrugID.row", how="left")
+    drug1_indexed = y_data_drug1.iloc[:,11:]
+    y_data_drug2 = y_data.join(drug_feature, on="DrugID.col", how="left")
+    drug2_indexed = y_data_drug2.iloc[:,11:]
+
+    # np for prepare_data()
+    cell_line = np.array(cell_indexed.values)
+    chem1 = np.array(drug1_indexed.values)
+    chem2 = np.array(drug2_indexed.values)
+    synergies = np.array(y_data["loewe"])
+
+    print("Files read.")
+    print("File preparing ...")
     # normalize and split data into train, validation and test
     norm = 'tanh_norm'
     train_data, val_data, test_data = MatchMaker.prepare_data(chem1, chem2, cell_line, synergies, norm,
-                                            params["train_ind"], params["val_ind"], params["test_ind"])
-
+                                            params["train_split_file"], params["val_split_file"], params["test_split_file"])
+    print("Files prepared.")
     # ------------------------------------------------------
     # [Req] Construct ML data for every stage (train, val, test)
     # ------------------------------------------------------
