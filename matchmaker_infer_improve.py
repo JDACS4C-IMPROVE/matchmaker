@@ -159,7 +159,7 @@ def main(args):
     additional_definitions = preprocess_params + train_params + infer_params
     params = frm.initialize_parameters(
         filepath,
-        default_model="params_original.txt",
+        default_model="params_v0.1data.txt",
         additional_definitions=additional_definitions,
         # required=req_infer_args,
         required=None,
