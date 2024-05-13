@@ -160,9 +160,9 @@ def run(params: Dict):
 
     # need to make this work for all feature types AND MULTIPLE
     # read data
-    y_data_fname = params["raw_data_dir"] + "/" + params["y_data_dir"] + "/" + + params["y_data_file"]
-    cell_feature_fname = params["raw_data_dir"] + "/" + params["x_data_dir"] + "/" + + params["cell_data_file"]
-    drug_feature_fname = params["raw_data_dir"] + "/" + params["x_data_dir"] + "/" + + params["drug_data_file"]
+    y_data_fname = params["raw_data_dir"] + "/" + params["y_data_dir"] + "/" + params["y_data_file"]
+    cell_feature_fname = params["raw_data_dir"] + "/" + params["x_data_dir"] + "/" + params["cell_data_file"]
+    drug_feature_fname = params["raw_data_dir"] + "/" + params["x_data_dir"] + "/" + params["drug_data_file"]
     y_data = pd.read_csv(y_data_fname, sep="\t")
     cell_feature = pd.read_csv(cell_feature_fname, sep="\t")
     drug_feature = pd.read_csv(drug_feature_fname, sep="\t", index_col="DrugID")
