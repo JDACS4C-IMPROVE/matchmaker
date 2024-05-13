@@ -62,6 +62,21 @@ model_preproc_params = [
      "default": "0",
      "help": "gpu device ids for CUDA_VISIBLE_DEVICES",
     },
+    {"name": "y_data_file",
+     "type": str,
+     "default": "synergy.tsv",
+     "help": "name of y data file",
+    },
+    {"name": "cell_data_file",
+     "type": str,
+     "default": "transcriptomics_L1000.tsv",
+     "help": "name of y data file",
+    },
+    {"name": "drug_data_file",
+     "type": str,
+     "default": "drug_mordred.tsv",
+     "help": "name of y data file",
+    },
     {"name": "arch",
      "type": str,
      "default": "matchmaker/architecture.txt",
@@ -143,11 +158,14 @@ def run(params: Dict):
     print("File reading ...")
  
 
-    # need to make this work for all feature types
+    # need to make this work for all feature types AND MULTIPLE
     # read data
-    y_data = pd.read_csv("raw_data/y_data/synergy.tsv", sep="\t")
-    cell_feature = pd.read_csv("raw_data/x_data/transcriptomics_L1000.tsv", sep="\t")
-    drug_feature = pd.read_csv("raw_data/x_data/drug_mordred.tsv", sep="\t", index_col="DrugID")
+    y_data_fname = params["raw_data_dir"] + "/" + params["y_data_dir"] + "/" + + params["y_data_file"]
+    cell_feature_fname = params["raw_data_dir"] + "/" + params["x_data_dir"] + "/" + + params["cell_data_file"]
+    drug_feature_fname = params["raw_data_dir"] + "/" + params["x_data_dir"] + "/" + + params["drug_data_file"]
+    y_data = pd.read_csv(y_data_fname, sep="\t")
+    cell_feature = pd.read_csv(cell_feature_fname, sep="\t")
+    drug_feature = pd.read_csv(drug_feature_fname, sep="\t", index_col="DrugID")
 
     # cell features
     y_data_cell = y_data.join(cell_feature, on="DepMapID", how="left")
@@ -163,15 +181,15 @@ def run(params: Dict):
     cell_line = np.array(cell_indexed.values)
     chem1 = np.array(drug1_indexed.values)
     chem2 = np.array(drug2_indexed.values)
-    synergies = np.array(y_data["loewe"])
+    synergies = np.array(y_data[params["y_col_name"]])
 
     print("Files read.")
     print("File preparing ...")
     # normalize and split data into train, validation and test
     norm = 'tanh_norm'
-    train_sp = "raw_data" + "/" + "splits" + "/" + params["train_split_file"]
-    val_sp = "raw_data" + "/" + "splits" + "/" + params["val_split_file"]
-    test_sp = "raw_data" + "/" + "splits" + "/" + params["test_split_file"]
+    train_sp = params["raw_data_dir"] + "/" + params["splits_dir"] + "/" + params["train_split_file"]
+    val_sp = params["raw_data_dir"] + "/" + params["splits_dir"] + "/" + params["val_split_file"]
+    test_sp = params["raw_data_dir"] + "/" + params["splits_dir"] + "/" + params["test_split_file"]
     train_data, val_data, test_data = MatchMaker.prepare_data(chem1, chem2, cell_line, synergies, norm,
                                             train_sp, val_sp, test_sp)
     print("Files prepared.")
@@ -182,13 +200,13 @@ def run(params: Dict):
     # Below, we iterate over the 3 split files (train, val, test) and load
     # response data, filtered by the split ids from the split files.
 
-    with open("train_data.pkl", 'wb+') as f:
+    with open(params["ml_data_outdir"]+"/"+"train_data.pkl", 'wb+') as f:
         pickle.dump(train_data, f, protocol=4)
 
-    with open("val_data.pkl", 'wb+') as f:
+    with open(params["ml_data_outdir"]+"/"+"val_data.pkl", 'wb+') as f:
         pickle.dump(val_data, f, protocol=4)
     
-    with open("test_data.pkl", 'wb+') as f:
+    with open(params["ml_data_outdir"]+"/"+"test_data.pkl", 'wb+') as f:
         pickle.dump(test_data, f, protocol=4)
    
 
