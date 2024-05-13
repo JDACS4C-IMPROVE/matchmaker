@@ -169,8 +169,11 @@ def run(params: Dict):
     print("File preparing ...")
     # normalize and split data into train, validation and test
     norm = 'tanh_norm'
+    train_sp = "raw_data" + "/" + "splits" + "/" + params["train_split_file"]
+    val_sp = "raw_data" + "/" + "splits" + "/" + params["val_split_file"]
+    test_sp = "raw_data" + "/" + "splits" + "/" + params["test_split_file"]
     train_data, val_data, test_data = MatchMaker.prepare_data(chem1, chem2, cell_line, synergies, norm,
-                                            (params["splits_path"] "/" + params["train_split_file"]), (params["splits_path"] "/" + params["val_split_file"]), (params["splits_path"] "/" + params["test_split_file"]))
+                                            train_sp, val_sp, test_sp)
     print("Files prepared.")
     # ------------------------------------------------------
     # [Req] Construct ML data for every stage (train, val, test)
