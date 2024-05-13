@@ -183,13 +183,13 @@ def run(params: Dict):
     # response data, filtered by the split ids from the split files.
 
     with open("train_data.pkl", 'wb+') as f:
-        pickle.dump(train_data, f)
+        pickle.dump(train_data, f, protocol=4)
 
     with open("val_data.pkl", 'wb+') as f:
-        pickle.dump(val_data, f)
+        pickle.dump(val_data, f, protocol=4)
     
     with open("test_data.pkl", 'wb+') as f:
-        pickle.dump(test_data, f)
+        pickle.dump(test_data, f, protocol=4)
    
 
     return params["ml_data_outdir"]
