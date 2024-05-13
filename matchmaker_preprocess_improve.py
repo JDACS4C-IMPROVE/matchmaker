@@ -145,9 +145,9 @@ def run(params: Dict):
 
     # need to make this work for all feature types
     # read data
-    y_data = pd.read_csv("y_data/synergy.tsv", sep="\t")
-    cell_feature = pd.read_csv("x_data/transcriptomics_L1000.tsv", sep="\t")
-    drug_feature = pd.read_csv("x_data/drug_mordred.tsv", sep="\t", index_col="DrugID")
+    y_data = pd.read_csv("raw_data/y_data/synergy.tsv", sep="\t")
+    cell_feature = pd.read_csv("raw_data/x_data/transcriptomics_L1000.tsv", sep="\t")
+    drug_feature = pd.read_csv("raw_data/x_data/drug_mordred.tsv", sep="\t", index_col="DrugID")
 
     # cell features
     y_data_cell = y_data.join(cell_feature, on="DepMapID", how="left")
