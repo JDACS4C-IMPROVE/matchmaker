@@ -89,7 +89,7 @@ def run(params):
     # ------------------------------------------------------
     # Prepare dataloaders to load model input data (ML data)
     # ------------------------------------------------------
-    with open("test_data.pkl", 'rb') as f:
+    with open(params["ml_data_outdir"]+"/"+"test_data.pkl", 'rb') as f:
         test_data = pickle.load(f)
 
     # ------------------------------------------------------
