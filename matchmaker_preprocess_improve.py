@@ -200,13 +200,20 @@ def run(params: Dict):
     # Below, we iterate over the 3 split files (train, val, test) and load
     # response data, filtered by the split ids from the split files.
 
-    with open(params["ml_data_outdir"]+"/"+"train_data.pkl", 'wb+') as f:
+    # ------------------------------------------------------
+    # [Req] Create data names for train and val sets
+    # ------------------------------------------------------
+    train_data_fname = frm.build_ml_data_name(params, stage="train")  # [Req]
+    val_data_fname = frm.build_ml_data_name(params, stage="val")  # [Req]
+    test_data_fname = frm.build_ml_data_name(params, stage="test")  # [Req]
+
+    with open(params[train_data_fname, 'wb+') as f:
         pickle.dump(train_data, f, protocol=4)
 
-    with open(params["ml_data_outdir"]+"/"+"val_data.pkl", 'wb+') as f:
+    with open(params[val_data_fname, 'wb+') as f:
         pickle.dump(val_data, f, protocol=4)
     
-    with open(params["ml_data_outdir"]+"/"+"test_data.pkl", 'wb+') as f:
+    with open(params[test_data_fname, 'wb+') as f:
         pickle.dump(test_data, f, protocol=4)
    
 

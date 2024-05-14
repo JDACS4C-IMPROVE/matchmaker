@@ -92,7 +92,7 @@ def run(params):
     # ------------------------------------------------------
     # Create output dir for trained model, val set predictions, val set
     # performance scores
-    #frm.create_outdir(outdir=params["model_outdir"])
+    frm.create_outdir(outdir=params["model_outdir"])
 
     # Build model path
     modelpath = frm.build_model_path(params, model_dir=params["model_outdir"])
@@ -100,13 +100,13 @@ def run(params):
     # ------------------------------------------------------
     # [Req] Create data names for train and val sets
     # ------------------------------------------------------
-    #train_data_fname = frm.build_ml_data_name(params, stage="train")  # [Req]
-    #val_data_fname = frm.build_ml_data_name(params, stage="val")  # [Req]
+    train_data_fname = frm.build_ml_data_name(params, stage="train")  # [Req]
+    val_data_fname = frm.build_ml_data_name(params, stage="val")  # [Req]
     # read data from preprocess
-    with open(params["ml_data_outdir"]+"/"+"train_data.pkl", 'rb') as f:
+    with open(params[train_data_fname, 'rb') as f:
         train_data = pickle.load(f)
 
-    with open(params["ml_data_outdir"]+"/"+"val_data.pkl", 'rb') as f:
+    with open(params[val_data_fname, 'rb') as f:
         val_data = pickle.load(f)
     
 
