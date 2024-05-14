@@ -85,11 +85,11 @@ def run(params):
     # ------------------------------------------------------
     test_data_fname = frm.build_ml_data_name(params, stage="test")
 
-
+    test_data_path = params["ml_data_outdir"] + "/" + test_data_fname
     # ------------------------------------------------------
     # Prepare dataloaders to load model input data (ML data)
     # ------------------------------------------------------
-    with open(test_data_fname, 'rb') as f:
+    with open(test_data_path, 'rb') as f:
         test_data = pickle.load(f)
 
     # ------------------------------------------------------

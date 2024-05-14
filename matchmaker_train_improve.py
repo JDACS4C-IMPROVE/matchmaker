@@ -102,11 +102,16 @@ def run(params):
     # ------------------------------------------------------
     train_data_fname = frm.build_ml_data_name(params, stage="train")  # [Req]
     val_data_fname = frm.build_ml_data_name(params, stage="val")  # [Req]
+
+    train_data_path = params["ml_data_outdir"] + "/" + train_data_fname
+    val_data_path = params["ml_data_outdir"] + "/" + val_data_fname
+    
+
     # read data from preprocess
-    with open(train_data_fname, 'rb') as f:
+    with open(train_data_path, 'rb') as f:
         train_data = pickle.load(f)
 
-    with open(val_data_fname, 'rb') as f:
+    with open(val_data_path, 'rb') as f:
         val_data = pickle.load(f)
     
 

@@ -207,13 +207,18 @@ def run(params: Dict):
     val_data_fname = frm.build_ml_data_name(params, stage="val")  # [Req]
     test_data_fname = frm.build_ml_data_name(params, stage="test")  # [Req]
 
-    with open(train_data_fname, 'wb+') as f:
+    train_data_path = params["ml_data_outdir"] + "/" + train_data_fname
+    val_data_path = params["ml_data_outdir"] + "/" + val_data_fname
+    test_data_path = params["ml_data_outdir"] + "/" + test_data_fname
+
+
+    with open(train_data_path, 'wb+') as f:
         pickle.dump(train_data, f, protocol=4)
 
-    with open(val_data_fname, 'wb+') as f:
+    with open(val_data_path, 'wb+') as f:
         pickle.dump(val_data, f, protocol=4)
     
-    with open(test_data_fname, 'wb+') as f:
+    with open(test_data_path, 'wb+') as f:
         pickle.dump(test_data, f, protocol=4)
    
 
