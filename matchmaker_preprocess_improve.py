@@ -164,16 +164,29 @@ def run(params: Dict):
  
 
     # need to make this work for all feature types AND MULTIPLE
-    # read data
+    # data file names
     y_data_fname = params["raw_data_dir"] + "/" + params["y_data_dir"] + "/" + params["y_data_file"]
     cell_feature_fname = params["raw_data_dir"] + "/" + params["x_data_dir"] + "/" + params["cell_data_file"]
     drug_feature_fname = params["raw_data_dir"] + "/" + params["x_data_dir"] + "/" + params["drug_data_file"]
+    # split file names
+    train_split_file = params["raw_data_dir"] + "/" + params["splits_dir"] + "/" + params["train_split_file"]
+    val_split_file = params["raw_data_dir"] + "/" + params["splits_dir"] + "/" + params["val_split_file"]
+    test_split_file = params["raw_data_dir"] + "/" + params["splits_dir"] + "/" + params["test_split_file"]
     # read in data
     y_data = pd.read_csv(y_data_fname, sep="\t")
     cell_feature = pd.read_csv(cell_feature_fname, sep="\t")
     drug_feature = pd.read_csv(drug_feature_fname, sep="\t", index_col="DrugID")
     # drop smiles col from drugs
     drug_feature.drop(drug_feature.columns[[0]], axis=1, inplace=True)
+    # read in splits
+    train = list(np.loadtxt(train_split_file,dtype=int))
+    val = list(np.loadtxt(val_split_file,dtype=int))
+    test = list(np.loadtxt(test_split_file,dtype=int))
+    y_data = y_data.reset_index(drop=True)
+    y_data["split"] = "NA"
+    y_data.loc[train, "split"] = "train"
+    y_data.loc[val, "split"] = "val"
+    y_data.loc[test, "split"] = "test"
 
     # prefix drug and cell features
     cell_feature = cell_feature.add_prefix("cell_")
@@ -184,6 +197,7 @@ def run(params: Dict):
     y_cell = y_data.join(cell_feature, on="DepMapID", how="inner")
     y_cell_d1 = y_cell.join(drug1_feature, on="DrugID.row", how="inner")
     y_cell_d1_d2 = y_cell_d1.join(drug2_feature, on="DrugID.col", how="inner")
+    y_cell_d1_d2 = y_cell_d1_d2.reset_index(drop=True)
 
     # pull out features
     drug2_indexed = y_cell_d1_d2.loc[:, y_cell_d1_d2.columns.str.startswith('drug2_')]
@@ -193,6 +207,19 @@ def run(params: Dict):
     # drop features for y data
     y_indexed = y_cell_d1_d2.drop(y_cell_d1_d2.columns[y_cell_d1_d2.columns.str.startswith(("drug2_", "drug1_", "cell_"))], axis=1)
 
+    # reindexed splits
+    train_index = y_indexed.index[y_indexed['split'] == "train"].to_frame()
+    val_index = y_indexed.index[y_indexed['split'] == "val"].to_frame()
+    test_index = y_indexed.index[y_indexed['split'] == "test"].to_frame()
+
+    train_sp = params["ml_data_outdir"] + "/train_split.txt"
+    val_sp = params["ml_data_outdir"] + "/val_split.txt"
+    test_sp = params["ml_data_outdir"] + "/test_split.txt"
+
+    train_index.to_csv(train_sp, index=False, header=False)
+    val_index.to_csv(val_sp, index=False, header=False)
+    test_index.to_csv(test_sp, index=False, header=False)
+    
     # np for prepare_data()
     cell_line = np.array(cell_indexed.values)
     chem1 = np.array(drug1_indexed.values)
@@ -203,9 +230,8 @@ def run(params: Dict):
     print("File preparing ...")
     # normalize and split data into train, validation and test
     norm = 'tanh_norm'
-    train_sp = params["raw_data_dir"] + "/" + params["splits_dir"] + "/" + params["train_split_file"]
-    val_sp = params["raw_data_dir"] + "/" + params["splits_dir"] + "/" + params["val_split_file"]
-    test_sp = params["raw_data_dir"] + "/" + params["splits_dir"] + "/" + params["test_split_file"]
+
+
     train_data, val_data, test_data = MatchMaker.prepare_data(chem1, chem2, cell_line, synergies, norm,
                                             train_sp, val_sp, test_sp)
     print("Files prepared.")
