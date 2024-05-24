@@ -8,6 +8,7 @@ test_split_file = "all_split_0_test.txt"
 data_format = ".pkl"
 y_col_name = "loewe"
 
+
 [Train]
 model_file_format = ".keras"
 epochs = 1000

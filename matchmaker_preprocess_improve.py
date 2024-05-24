@@ -107,6 +107,11 @@ model_preproc_params = [
      "default": 8,
      "help": "num_cores",
     },
+    {"name": "datasets",
+     "type": str,
+     "default": "ALMANAC",
+     "help": "datasets to use",
+    },
 ]
 
 # Combine the two lists (the combined parameter list will be passed to
@@ -163,25 +168,36 @@ def run(params: Dict):
     y_data_fname = params["raw_data_dir"] + "/" + params["y_data_dir"] + "/" + params["y_data_file"]
     cell_feature_fname = params["raw_data_dir"] + "/" + params["x_data_dir"] + "/" + params["cell_data_file"]
     drug_feature_fname = params["raw_data_dir"] + "/" + params["x_data_dir"] + "/" + params["drug_data_file"]
+    # read in data
     y_data = pd.read_csv(y_data_fname, sep="\t")
     cell_feature = pd.read_csv(cell_feature_fname, sep="\t")
     drug_feature = pd.read_csv(drug_feature_fname, sep="\t", index_col="DrugID")
+    # drop smiles col from drugs
+    drug_feature.drop(drug_feature.columns[[0]], axis=1, inplace=True)
 
-    # cell features
-    y_data_cell = y_data.join(cell_feature, on="DepMapID", how="left")
-    cell_indexed = y_data_cell.iloc[:,10:]
+    # prefix drug and cell features
+    cell_feature = cell_feature.add_prefix("cell_")
+    drug1_feature = drug_feature.add_prefix("drug1_")
+    drug2_feature = drug_feature.add_prefix("drug2_")
 
-    # drug features
-    y_data_drug1 = y_data.join(drug_feature, on="DrugID.row", how="left")
-    drug1_indexed = y_data_drug1.iloc[:,11:]
-    y_data_drug2 = y_data.join(drug_feature, on="DrugID.col", how="left")
-    drug2_indexed = y_data_drug2.iloc[:,11:]
+    # join all datasets on inner
+    y_cell = y_data.join(cell_feature, on="DepMapID", how="inner")
+    y_cell_d1 = y_cell.join(drug1_feature, on="DrugID.row", how="inner")
+    y_cell_d1_d2 = y_cell_d1.join(drug2_feature, on="DrugID.col", how="inner")
+
+    # pull out features
+    drug2_indexed = y_cell_d1_d2.loc[:, y_cell_d1_d2.columns.str.startswith('drug2_')]
+    drug1_indexed = y_cell_d1_d2.loc[:, y_cell_d1_d2.columns.str.startswith('drug1_')]
+    cell_indexed = y_cell_d1_d2.loc[:, y_cell_d1_d2.columns.str.startswith('cell_')]
+
+    # drop features for y data
+    y_indexed = y_cell_d1_d2.drop(y_cell_d1_d2.columns[y_cell_d1_d2.columns.str.startswith(("drug2_", "drug1_", "cell_"))], axis=1)
 
     # np for prepare_data()
     cell_line = np.array(cell_indexed.values)
     chem1 = np.array(drug1_indexed.values)
     chem2 = np.array(drug2_indexed.values)
-    synergies = np.array(y_data[params["y_col_name"]])
+    synergies = np.array(y_indexed[params["y_col_name"]])
 
     print("Files read.")
     print("File preparing ...")
