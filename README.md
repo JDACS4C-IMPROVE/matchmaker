@@ -2,7 +2,7 @@
 
 ---
 
-This is the IMPROVE implementation of the original model with original data.
+This is the IMPROVE implementation of the original model with IMPROVE v0.1 data.
 
 ## Dependencies and Installation
 ### Conda Environment
@@ -28,8 +28,8 @@ git checkout develop
 cd ..
 ```
 
-### Download Original Data
-You can download preprocessed data from <a href="https://drive.google.com/open?id=1eQpwJKiIdMI0wTz_GEa285q0GHUr6wRe">**link**</a>, extract all files into `data/`
+### IMPROVE Synergy Data
+Currently internal -- will update when posted.
 
 
 ## Running the Model
