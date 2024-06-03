@@ -16,7 +16,7 @@ pip install git+https://github.com/ECP-CANDLE/candle_lib@develop
 ```
 git clone https://github.com/JDACS4C-IMPROVE/matchmaker
 cd matchmaker
-git checkout IMPROVE-original
+git checkout IMPROVE-v0.1
 cd ..
 ```
 
