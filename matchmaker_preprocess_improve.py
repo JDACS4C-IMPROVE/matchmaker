@@ -122,17 +122,6 @@ preprocess_params = app_preproc_params + model_preproc_params
 
 # [Req]
 def run(params: Dict):
-    """ Run data preprocessing.
-
-    Args:
-        params (dict): dict of CANDLE/IMPROVE parameters and parsed values.
-
-    Returns:
-        str: directory name that was used to save the preprocessed (generated)
-            ML data files.
-    """
-    # import pdb; pdb.set_trace()
-
     # ------------------------------------------------------
     # [Req] Build paths and create output dir
     # ------------------------------------------------------
@@ -145,21 +134,6 @@ def run(params: Dict):
     # ------------------------------------------------------
     # [Req] Load X data (feature representations)
     # ------------------------------------------------------
-    # Use the provided data loaders to load data that is required by the model.
-    #
-    # Benchmark data includes three dirs: x_data, y_data, splits.
-    # The x_data contains files that represent feature information such as
-    # cancer representation (e.g., omics) and drug representation (e.g., SMILES).
-    #
-    # Prediction models utilize various types of feature representations.
-    # Drug response prediction (DRP) models generally use omics and drug features.
-    #
-    # If the model uses omics data types that are provided as part of the benchmark
-    # data, then the model must use the provided data loaders to load the data files
-    # from the x_data dir.
-   # load and process data
-    
-
     print("File reading ...")
  
 
@@ -175,6 +149,7 @@ def run(params: Dict):
     # read in data
     y_data = pd.read_csv(y_data_fname, sep="\t")
     cell_feature = pd.read_csv(cell_feature_fname, sep="\t")
+    cell_feature = cell_feature.set_index('DepMap_ID')
     drug_feature = pd.read_csv(drug_feature_fname, sep="\t", index_col="DrugID")
     # drop smiles col from drugs
     drug_feature.drop(drug_feature.columns[[0]], axis=1, inplace=True)
