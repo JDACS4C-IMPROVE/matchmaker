@@ -172,6 +172,7 @@ def run(params: Dict):
     y_cell = y_data.join(cell_feature, on="DepMapID", how="inner")
     y_cell_d1 = y_cell.join(drug1_feature, on="DrugID.row", how="inner")
     y_cell_d1_d2 = y_cell_d1.join(drug2_feature, on="DrugID.col", how="inner")
+    y_cell_d1_d2 = y_cell_d1_d2.dropna(subset=[params["y_col_name"]])
     y_cell_d1_d2 = y_cell_d1_d2.reset_index(drop=True)
 
     # pull out features
