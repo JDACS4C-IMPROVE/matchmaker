@@ -30,7 +30,7 @@ train_params = [
      "help": "gpu device ids for CUDA_VISIBLE_DEVICES",
     },
     {"name": "gpu-support",
-     "type": frm.str2bool,
+     "type": str2bool,
      "default": True,
      "help": "Use GPU support or not",
     },
