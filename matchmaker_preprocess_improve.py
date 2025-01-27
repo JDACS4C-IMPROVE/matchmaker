@@ -135,9 +135,12 @@ def run(params: Dict):
     # --------------------------------------------------------------------
     # [Req] Save response data (Y data)
     # --------------------------------------------------------------------
-
-    # to implement
-   
+    ydf_train = y_data[y_data["split"] == "train"]
+    ydf_val = y_data[y_data["split"] == "val"]
+    ydf_test = y_data[y_data["split"] == "test"]
+    frm.save_stage_ydf(ydf=ydf_train, stage="train", output_dir=params["output_dir"])
+    frm.save_stage_ydf(ydf=ydf_val, stage="val", output_dir=params["output_dir"])
+    frm.save_stage_ydf(ydf=ydf_test, stage="test", output_dir=params["output_dir"])
 
     return params["output_dir"]
 
