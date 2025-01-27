@@ -92,7 +92,7 @@ def run(params):
     # Train. Iterate over epochs.
     # -----------------------------
     model = MatchMaker.trainer(model, params["learning_rate"], train_data, val_data, params["epochs"], params["batch_size"],
-                                params["patience"], params["model_name"], loss_weight)
+                                params["patience"], params["model_file_name"], loss_weight)
 
     # -----------------------------
     # Save model
