@@ -29,3 +29,4 @@ input_model_dir = ./testing_train
 output_dir = ./testing_infer
 y_col_name = loewe
 data_format = .pkl
+model_file_format = .keras
