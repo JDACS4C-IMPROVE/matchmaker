@@ -24,16 +24,6 @@ preprocess_params = [
     },
 ]
 train_params = [
-    {"name": "gpu-devices",
-     "type": str,
-     "default": "0",
-     "help": "gpu device ids for CUDA_VISIBLE_DEVICES",
-    },
-    {"name": "gpu-support",
-     "type": str2bool,
-     "default": True,
-     "help": "Use GPU support or not",
-    },
     {"name": "num_cores",
      "type": int,
      "default": 8,
@@ -56,16 +46,6 @@ train_params = [
     },
 ]
 infer_params = [
-    {"name": "gpu-devices",
-     "type": str,
-     "default": "0",
-     "help": "gpu device ids for CUDA_VISIBLE_DEVICES",
-    },
-    {"name": "gpu-support",
-     "type": str2bool,
-     "default": True,
-     "help": "Use GPU support or not",
-    },
     {"name": "num_cores",
      "type": int,
      "default": 8,
