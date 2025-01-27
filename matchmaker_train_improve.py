@@ -17,6 +17,7 @@ import tensorflow as tf
 import MatchMaker
 import pickle
 import tensorflow.keras as keras
+from model_params_def import train_params
 
 filepath = Path(__file__).resolve().parent # [Req]
 
