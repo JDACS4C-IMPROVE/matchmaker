@@ -52,8 +52,8 @@ def run(params):
     # CUDA/CPU device
     # ------------------------------------------------------
 
-    os.environ["CUDA_VISIBLE_DEVICES"] = params["gpu_devices"]
-    if params["gpu_support"]:
+    cuda_avail = os.environ["CUDA_VISIBLE_DEVICES"]
+    if cuda_avail is not None:
         num_GPU = 1
         num_CPU = 1
     else:
