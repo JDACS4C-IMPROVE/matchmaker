@@ -135,9 +135,9 @@ def run(params: Dict):
     # --------------------------------------------------------------------
     # [Req] Save response data (Y data)
     # --------------------------------------------------------------------
-    ydf_train = y_data[y_data["split"] == "train"]
-    ydf_val = y_data[y_data["split"] == "val"]
-    ydf_test = y_data[y_data["split"] == "test"]
+    ydf_train = y_indexed[y_indexed["split"] == "train"]
+    ydf_val = y_indexed[y_indexed["split"] == "val"]
+    ydf_test = y_indexed[y_indexed["split"] == "test"]
     frm.save_stage_ydf(ydf=ydf_train, stage="train", output_dir=params["output_dir"])
     frm.save_stage_ydf(ydf=ydf_val, stage="val", output_dir=params["output_dir"])
     frm.save_stage_ydf(ydf=ydf_test, stage="test", output_dir=params["output_dir"])
