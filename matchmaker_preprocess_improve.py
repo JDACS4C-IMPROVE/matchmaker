@@ -43,13 +43,14 @@ def run(params: Dict):
 
     # need to make this work for all feature types AND MULTIPLE
     # data file names
-    y_data_fname = params["raw_data_dir"] + "/" + params["y_data_dir"] + "/" + params["y_data_file"]
-    cell_feature_fname = params["raw_data_dir"] + "/" + params["x_data_dir"] + "/" + params["cell_data_file"]
-    drug_feature_fname = params["raw_data_dir"] + "/" + params["x_data_dir"] + "/" + params["drug_data_file"]
+    # eventually fix this in improvelib so it checks for a path, and then in the input_dir
+    y_data_fname = params["input_dir"] + "/" + "y_data" + "/" + params["y_data_file"]
+    cell_feature_fname = params["input_dir"] + "/" + "x_data" + "/" + params["cell_data_file"]
+    drug_feature_fname = params["input_dir"] + "/" + "x_data" + "/" + params["drug_data_file"]
     # split file names
-    train_split_file = params["raw_data_dir"] + "/" + params["splits_dir"] + "/" + params["train_split_file"]
-    val_split_file = params["raw_data_dir"] + "/" + params["splits_dir"] + "/" + params["val_split_file"]
-    test_split_file = params["raw_data_dir"] + "/" + params["splits_dir"] + "/" + params["test_split_file"]
+    train_split_file = params["input_dir"] + "/" + "splits" + "/" + params["train_split_file"]
+    val_split_file = params["input_dir"] + "/" + "splits" + "/" + params["val_split_file"]
+    test_split_file = params["input_dir"] + "/" + "splits" + "/" + params["test_split_file"]
     # read in data
     y_data = pd.read_csv(y_data_fname, sep="\t")
     cell_feature = pd.read_csv(cell_feature_fname, sep="\t")
