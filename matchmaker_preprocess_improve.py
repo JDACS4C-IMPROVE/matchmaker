@@ -1,135 +1,38 @@
 """ Preprocess original data to generate datasets for the
 Matchmaker prediction model.
 
-Required outputs
-----------------
-All the outputs from this preprocessing script are saved in params["ml_data_outdir"].
-
-1. Model input data files.
-   This script creates three data files corresponding to train, validation,
-   and test data. These data files are used as inputs to the ML/DL model in
-   the train and infer scripts. The file format is specified by
-   params["data_format"].
-
-2. Y data files are not generated seperately for the original data
 """
 
 import sys
 from pathlib import Path
 from typing import Dict
-
+# [Req] Core improvelib imports
+from improvelib.applications.drug_response_prediction.config import DRPPreprocessConfig
+from improvelib.utils import str2bool
+import improvelib.utils as frm
+# Model-specific imports
 import numpy as np
 import pandas as pd
 import joblib
-
-# [Req] IMPROVE/CANDLE imports
-from improve import framework as frm
-from improve import drug_resp_pred as drp
-
-# Model-specific imports
 import os
 import MatchMaker
 import pickle
 
 filepath = Path(__file__).resolve().parent # [Req]
 
-# ---------------------
-# [Req] Parameter lists
-# ---------------------
-# Two parameter lists are required:
-# 1. app_preproc_params
-# 2. model_preproc_params
-# 
-# The values for the parameters in both lists should be specified in a
-# parameter file that is passed as default_model arg in
-# frm.initialize_parameters().
-
-# 1. App-specific params (App: monotherapy drug response prediction)
-# Note! This list should not be modified (i.e., no params should added or
-# removed from the list.
-# 
-# There are two types of params in the list: default and required
-# default:   default values should be used
-# required:  these params must be specified for the model in the param file
-app_preproc_params = []
-
-# 2. Model-specific params 
-# All params in model_preproc_params are optional.
-# If no params are required by the model, then it should be an empty list.
-model_preproc_params = [
-    {"name": "gpu-devices",
-     "type": str,
-     "default": "0",
-     "help": "gpu device ids for CUDA_VISIBLE_DEVICES",
-    },
-    {"name": "y_data_file",
-     "type": str,
-     "default": "synergy.tsv",
-     "help": "name of y data file",
-    },
-    {"name": "cell_data_file",
-     "type": str,
-     "default": "transcriptomics_L1000.tsv",
-     "help": "name of y data file",
-    },
-    {"name": "drug_data_file",
-     "type": str,
-     "default": "drug_mordred.tsv",
-     "help": "name of y data file",
-    },
-    {"name": "arch",
-     "type": str,
-     "default": "matchmaker/architecture.txt",
-     "help": "Architecute file to construct MatchMaker layers",
-    },
-    {"name": "gpu-support",
-     "type": frm.str2bool,
-     "default": True,
-     "help": "Use GPU support or not",
-    },
-    {"name": "l_rate",
-     "type": float,
-     "default": 0.0001,
-     "help": "Learning rate",
-    },
-    {"name": "inDrop",
-     "type": float,
-     "default": 0.0001,
-     "help": "inDrop",
-    },
-    {"name": "drop",
-     "type": float,
-     "default": 0.5,
-     "help": "drop",
-    },
-    {"name": "num_cores",
-     "type": int,
-     "default": 8,
-     "help": "num_cores",
-    },
-    {"name": "datasets",
-     "type": str,
-     "default": "ALMANAC",
-     "help": "datasets to use",
-    },
-]
-
-# Combine the two lists (the combined parameter list will be passed to
-# frm.initialize_parameters() in the main().
-preprocess_params = app_preproc_params + model_preproc_params
-# ---------------------
 
 
 # [Req]
 def run(params: Dict):
-    # ------------------------------------------------------
-    # [Req] Build paths and create output dir
-    # ------------------------------------------------------
-    # Build paths for raw_data, x_data, y_data, splits
-    params = frm.build_paths(params)  
+    # --------------------------------------------------------------------
+    # [Req] Create data names for train/val/test sets
+    # --------------------------------------------------------------------
+    data_train_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="train")
+    data_val_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="val")
+    data_test_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="test")
 
     # Create output dir for model input data (to save preprocessed ML data)
-    frm.create_outdir(outdir=params["ml_data_outdir"])
+    #frm.create_outdir(outdir=params["ml_data_outdir"])
 
     # ------------------------------------------------------
     # [Req] Load X data (feature representations)
@@ -151,7 +54,7 @@ def run(params: Dict):
     cell_feature = pd.read_csv(cell_feature_fname, sep="\t")
     cell_feature = cell_feature.set_index('DepMap_ID')
     drug_feature = pd.read_csv(drug_feature_fname, sep="\t", index_col="DrugID")
-    # drop smiles col from drugs
+    # drop smiles col from drugs - should be removed from a future version
     drug_feature.drop(drug_feature.columns[[0]], axis=1, inplace=True)
     # read in splits
     train = list(np.loadtxt(train_split_file,dtype=int))
@@ -188,9 +91,9 @@ def run(params: Dict):
     val_index = y_indexed.index[y_indexed['split'] == "val"].to_frame()
     test_index = y_indexed.index[y_indexed['split'] == "test"].to_frame()
 
-    train_sp = params["ml_data_outdir"] + "/train_split.txt"
-    val_sp = params["ml_data_outdir"] + "/val_split.txt"
-    test_sp = params["ml_data_outdir"] + "/test_split.txt"
+    train_sp = params["output_dir"] + "/train_split.txt"
+    val_sp = params["output_dir"] + "/val_split.txt"
+    test_sp = params["output_dir"] + "/test_split.txt"
 
     train_index.to_csv(train_sp, index=False, header=False)
     val_index.to_csv(val_sp, index=False, header=False)
@@ -214,21 +117,9 @@ def run(params: Dict):
     # ------------------------------------------------------
     # [Req] Construct ML data for every stage (train, val, test)
     # ------------------------------------------------------
-    # All models must load response data (y data) using DrugResponseLoader().
-    # Below, we iterate over the 3 split files (train, val, test) and load
-    # response data, filtered by the split ids from the split files.
-
-    # ------------------------------------------------------
-    # [Req] Create data names for train and val sets
-    # ------------------------------------------------------
-    train_data_fname = frm.build_ml_data_name(params, stage="train")  # [Req]
-    val_data_fname = frm.build_ml_data_name(params, stage="val")  # [Req]
-    test_data_fname = frm.build_ml_data_name(params, stage="test")  # [Req]
-
-    train_data_path = params["ml_data_outdir"] + "/" + train_data_fname
-    val_data_path = params["ml_data_outdir"] + "/" + val_data_fname
-    test_data_path = params["ml_data_outdir"] + "/" + test_data_fname
-
+    train_data_path = params["output_dir"] + "/" + data_train_fname
+    val_data_path = params["output_dir"] + "/" + data_val_fname
+    test_data_path = params["output_dir"] + "/" + data_test_fname
 
     with open(train_data_path, 'wb+') as f:
         pickle.dump(train_data, f, protocol=4)
@@ -238,21 +129,24 @@ def run(params: Dict):
     
     with open(test_data_path, 'wb+') as f:
         pickle.dump(test_data, f, protocol=4)
+
+    # --------------------------------------------------------------------
+    # [Req] Save response data (Y data)
+    # --------------------------------------------------------------------
+
+    # to implement
    
 
-    return params["ml_data_outdir"]
+    return params["output_dir"]
 
 
 # [Req]
 def main(args):
-    # [Req]
-    additional_definitions = preprocess_params
-    params = frm.initialize_parameters(
-        filepath,
-        default_model="params_v0.1data.txt",
-        additional_definitions=additional_definitions,
-        required=None,
-    )
+    cfg = DRPPreprocessConfig()
+    params = cfg.initialize_parameters(
+        pathToModelDir=filepath,
+        default_config="params_v0.1data.txt",
+        additional_definitions=preprocess_params)
     ml_data_outdir = run(params)
     print("\nFinished data preprocessing.")
 

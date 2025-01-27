@@ -1,110 +1,42 @@
 """ Train Matchmaker for drug response prediction.
-
-Required outputs
-----------------
-All the outputs from this train script are saved in params["model_outdir"].
-
-1. Trained model.
-   The model is trained with train data and validated with val data. The model
-   file name and file format are specified, respectively by
-   params["model_file_name"] and params["model_file_format"].
-
-2. Predictions on val data. 
-   Raw model predictions calcualted using the trained model on val data. The
-   predictions are saved in val_y_data_predicted.csv
-
-3. Prediction performance scores on val data.
-   The performance scores are calculated using the raw model predictions and
-   the true values for performance metrics specified in the metrics_list. The
-   scores are saved as json in val_scores.json
 """
-
 import sys
 from pathlib import Path
 from typing import Dict
-
-import numpy as np
-import pandas as pd
-
-
-# [Req] IMPROVE/CANDLE imports
-from improve import framework as frm
-from improve.metrics import compute_metrics
-
+# [Req] IMPROVE imports
+from improvelib.applications.drug_response_prediction.config import DRPTrainConfig
+from improvelib.utils import str2bool
+import improvelib.utils as frm
+from improvelib.metrics import compute_metrics
+from model_params_def import train_params
 # Model-specific imports
 import os
+import numpy as np
+import pandas as pd
 import tensorflow as tf
 import MatchMaker
 import pickle
 import tensorflow.keras as keras
 
-# [Req] Imports from preprocess script
-from matchmaker_preprocess_improve import preprocess_params
-
 filepath = Path(__file__).resolve().parent # [Req]
-
-# ---------------------
-# [Req] Parameter lists
-# ---------------------
-# Two parameter lists are required:
-# 1. app_train_params
-# 2. model_train_params
-# 
-# The values for the parameters in both lists should be specified in a
-# parameter file that is passed as default_model arg in
-# frm.initialize_parameters().
-
-# 1. App-specific params (App: monotherapy drug response prediction)
-# Currently, there are no app-specific params for this script.
-app_train_params = []
-
-# 2. Model-specific params (Model: GraphDRP)
-# All params in model_train_params are optional.
-# If no params are required by the model, then it should be an empty list.
-model_train_params = []
-
-# Combine the two lists (the combined parameter list will be passed to
-# frm.initialize_parameters() in the main().
-train_params = app_train_params + model_train_params
-# ---------------------
-
-# [Req] List of metrics names to compute prediction performance scores
-metrics_list = ["mse", "rmse", "pcc", "scc", "r2"]  
 
 # [Req]
 def run(params):
-    """ Run model training.
-
-    Args:
-        params (dict): dict of CANDLE/IMPROVE parameters and parsed values.
-
-    Returns:
-        dict: prediction performance scores computed on validation data
-            according to the metrics_list.
-    """
-
-
-
 # save model
+    # --------------------------------------------------------------------
+    # [Req] Create data names for train/val sets and build model path
+    # --------------------------------------------------------------------
+    train_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="train")  # [Req]
+    val_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="val")  # [Req]
 
-    # ------------------------------------------------------
-    # [Req] Create output dir and build model path
-    # ------------------------------------------------------
-    # Create output dir for trained model, val set predictions, val set
-    # performance scores
-    frm.create_outdir(outdir=params["model_outdir"])
+    modelpath = frm.build_model_path(
+        model_file_name=params["model_file_name"],
+        model_file_format=params["model_file_format"],
+        model_dir=params["output_dir"])
+    
 
-    # Build model path
-    modelpath = frm.build_model_path(params, model_dir=params["model_outdir"])
-
-    # ------------------------------------------------------
-    # [Req] Create data names for train and val sets
-    # ------------------------------------------------------
-    train_data_fname = frm.build_ml_data_name(params, stage="train")  # [Req]
-    val_data_fname = frm.build_ml_data_name(params, stage="val")  # [Req]
-
-    train_data_path = params["ml_data_outdir"] + "/" + train_data_fname
-    val_data_path = params["ml_data_outdir"] + "/" + val_data_fname
+    train_data_path = params["input_dir"] + "/" + train_data_fname
+    val_data_path = params["input_dir"] + "/" + val_data_fname
     
 
     # read data from preprocess
@@ -158,7 +90,7 @@ def run(params):
     # -----------------------------
     # Train. Iterate over epochs.
     # -----------------------------
-    model = MatchMaker.trainer(model, params["l_rate"], train_data, val_data, params["epochs"], params["batch_size"],
+    model = MatchMaker.trainer(model, params["learning_rate"], train_data, val_data, params["epochs"], params["batch_size"],
                                 params["patience"], params["model_name"], loss_weight)
 
     # -----------------------------
@@ -182,41 +114,39 @@ def run(params):
     # [Req] Save raw predictions in dataframe
     # ------------------------------------------------------
     frm.store_predictions_df(
-        params,
-        y_true=val_true, y_pred=val_pred, stage="val",
-        outdir=params["model_outdir"]
+        y_true=val_true,
+        y_pred=val_pred,
+        stage="val",
+        y_col_name=params["y_col_name"],
+        output_dir=params["output_dir"],
+        input_dir=params["input_dir"]
     )
+
 
     # ------------------------------------------------------
     # [Req] Compute performance scores
     # ------------------------------------------------------
-    val_scores = frm.compute_performace_scores(
-        params,
-        y_true=val_true, y_pred=val_pred, stage="val",
-        outdir=params["model_outdir"], metrics=metrics_list
+    val_scores = frm.compute_performance_scores(
+        y_true=val_true,
+        y_pred=val_pred,
+        stage="val",
+        metric_type=params["metric_type"],
+        output_dir=params["output_dir"]
     )
 
     return val_scores
 
 
-def initialize_parameters():
-    additional_definitions = preprocess_params + train_params
-    params = frm.initialize_parameters(
-        filepath,
-        default_model="params_v0.1data.txt",
-        additional_definitions=additional_definitions,
-        # required=req_train_args,
-        required=None,
-    )
-    return params
-
 
 # [Req]
 def main(args):
-# [Req]
-    params = initialize_parameters()
+    cfg = DRPTrainConfig()
+    params = cfg.initialize_parameters(
+        pathToModelDir=filepath,
+        default_config="params_v0.1data.txt",
+        additional_definitions=train_params)
     val_scores = run(params)
-    print("\nFinished training GraphDRP model.")
+    print("\nFinished training model.")
 
 
 # [Req]

@@ -1,17 +1,4 @@
 """ Inference with Matchmaker for drug response prediction.
-
-Required outputs
-----------------
-All the outputs from this infer script are saved in params["infer_outdir"].
-
-1. Predictions on test data.
-   Raw model predictions calcualted using the trained model on test data. The
-   predictions are saved in test_y_data_predicted.csv
-
-2. Prediction performance scores on test data.
-   The performance scores are calculated using the raw model predictions and
-   the true values for performance metrics specified in the metrics_list. The
-   scores are saved as json in test_scores.json
 """
 
 import sys
@@ -20,8 +7,11 @@ from typing import Dict
 
 import pandas as pd
 
-# [Req] IMPROVE/CANDLE imports
-from improve import framework as frm
+# [Req] IMPROVE imports
+from improvelib.applications.drug_response_prediction.config import DRPInferConfig
+from improvelib.utils import str2bool
+import improvelib.utils as frm
+from model_params_def import infer_params
 
 # Model-specific imports
 import os
@@ -31,61 +21,22 @@ import MatchMaker
 import pickle
 import tensorflow.keras as keras
 
-# [Req] Imports from preprocess and train scripts
-from matchmaker_preprocess_improve import preprocess_params
-from matchmaker_train_improve import metrics_list, train_params
 
 filepath = Path(__file__).resolve().parent # [Req]
-
-# ---------------------
-# [Req] Parameter lists
-# ---------------------
-# Two parameter lists are required:
-# 1. app_infer_params
-# 2. model_infer_params
-# 
-# The values for the parameters in both lists should be specified in a
-# parameter file that is passed as default_model arg in
-# frm.initialize_parameters().
-
-# 1. App-specific params (App: monotherapy drug response prediction)
-# Currently, there are no app-specific params in this script.
-app_infer_params = []
-
-# 2. Model-specific params (Model: GraphDRP)
-# All params in model_infer_params are optional.
-# If no params are required by the model, then it should be an empty list.
-model_infer_params = []
-
-# [Req] Combine the two lists (the combined parameter list will be passed to
-# frm.initialize_parameters() in the main().
-infer_params = app_infer_params + model_infer_params
-# ---------------------
 
 
 # [Req]
 def run(params):
-    """ Run model inference.
+     # --------------------------------------------------------------------
+    # [Req] Create data names for test set and build model path
+    # --------------------------------------------------------------------
+    test_data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage="test")
+    modelpath = frm.build_model_path(
+        model_file_name=params["model_file_name"],
+        model_file_format=params["model_file_format"],
+        model_dir=params["output_dir"])
 
-    Args:
-        params (dict): dict of CANDLE/IMPROVE parameters and parsed values.
-
-    Returns:
-        dict: prediction performance scores computed on test data according
-            to the metrics_list.
-    """
-
-    # ------------------------------------------------------
-    # [Req] Create output dir
-    # ------------------------------------------------------
-    frm.create_outdir(outdir=params["infer_outdir"])
-
-    # ------------------------------------------------------
-    # [Req] Create data names for test set
-    # ------------------------------------------------------
-    test_data_fname = frm.build_ml_data_name(params, stage="test")
-
-    test_data_path = params["ml_data_outdir"] + "/" + test_data_fname
+    test_data_path = params["input_data_dir"] + "/" + test_data_fname
     # ------------------------------------------------------
     # Prepare dataloaders to load model input data (ML data)
     # ------------------------------------------------------
@@ -116,9 +67,7 @@ def run(params):
     # ------------------------------------------------------
     # Load best model and compute predictions
     # ------------------------------------------------------
-    # Load the best saved model (as determined based on val data)
-    modelpath = frm.build_model_path(params, model_dir=params["model_dir"]) # [Req]
-    ##########################
+
     # load the best model
     #model.load_weights(modelName)
     model = keras.models.load_model(str(modelpath))
@@ -136,19 +85,27 @@ def run(params):
     # [Req] Save raw predictions in dataframe
     # ------------------------------------------------------
     frm.store_predictions_df(
-        params,
-        y_true=test_true, y_pred=test_pred, stage="test",
-        outdir=params["infer_outdir"]
+        y_true=test_true,
+        y_pred=test_pred,
+        stage="test",
+        y_col_name=params["y_col_name"],
+        output_dir=params["output_dir"],
+        input_dir=params["input_data_dir"]
     )
+
 
     # ------------------------------------------------------
     # [Req] Compute performance scores
     # ------------------------------------------------------
-    test_scores = frm.compute_performace_scores(
-        params,
-        y_true=test_true, y_pred=test_pred, stage="test",
-        outdir=params["infer_outdir"], metrics=metrics_list
-    )
+    if params["calc_infer_scores"]:
+        test_scores = frm.compute_performance_scores(
+            y_true=test_true,
+            y_pred=test_pred,
+            stage="test",
+            metric_type=params["metric_type"],
+            output_dir=params["output_dir"]
+        )
+
 
     return test_scores
 

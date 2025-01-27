@@ -1,7 +1,7 @@
-[Global_Params]
-model_name = "matchmaker"
+[DEFAULT]
 
 [Preprocess]
+output_dir = "./testing_preprocess"
 train_split_file = "all_split_0_train.txt"
 val_split_file = "all_split_0_val.txt"
 test_split_file = "all_split_0_test.txt"
@@ -9,11 +9,21 @@ data_format = ".pkl"
 y_col_name = "loewe"
 
 
+
 [Train]
+input_dir = "./testing_preprocess"
+output_dir = "./testing_train"
 model_file_format = ".keras"
+learning_rate = 0.0001
 epochs = 1000
 batch_size = 128
 patience = 100
+data_format = ".pkl"
+y_col_name = "loewe"
 
 [Infer]
-
+calc_infer_scores = True
+input_data_dir = "./testing_preprocess"
+input_model_dir = "./testing_train"
+output_dir = "./testing_infer"
+y_col_name = "loewe"
