@@ -20,11 +20,11 @@ git checkout IMPROVE-original
 cd ..
 ```
 
-### Clone IMPROVE repository
+### Clone IMPROVE repository (uses v0.0.3-beta)
 ```
 git clone https://github.com/JDACS4C-IMPROVE/IMPROVE
 cd IMPROVE
-git checkout develop
+git checkout v0.0.3-beta
 cd ..
 ```
 
