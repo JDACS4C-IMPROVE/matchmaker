@@ -4,10 +4,8 @@ import sys
 from pathlib import Path
 from typing import Dict
 # [Req] IMPROVE imports
-from improvelib.applications.drug_response_prediction.config import DRPTrainConfig
-from improvelib.utils import str2bool
+from improvelib.applications.synergy.config import SynergyTrainConfig
 import improvelib.utils as frm
-from improvelib.metrics import compute_metrics
 from model_params_def import train_params
 # Model-specific imports
 import os
@@ -141,10 +139,10 @@ def run(params):
 
 # [Req]
 def main(args):
-    cfg = DRPTrainConfig()
+    cfg = SynergyTrainConfig()
     params = cfg.initialize_parameters(
         pathToModelDir=filepath,
-        default_config="params_v0.1data.txt",
+        default_config="matchmaker_params.ini",
         additional_definitions=train_params)
     val_scores = run(params)
     print("\nFinished training model.")

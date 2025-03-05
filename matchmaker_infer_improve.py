@@ -8,8 +8,7 @@ from typing import Dict
 import pandas as pd
 
 # [Req] IMPROVE imports
-from improvelib.applications.drug_response_prediction.config import DRPInferConfig
-from improvelib.utils import str2bool
+from improvelib.applications.synergy.config import SynergyInferConfig
 import improvelib.utils as frm
 from model_params_def import infer_params
 
@@ -112,10 +111,10 @@ def run(params):
 
 # [Req]
 def main(args):
-    cfg = DRPInferConfig()
+    cfg = SynergyInferConfig()
     params = cfg.initialize_parameters(
         pathToModelDir=filepath,
-        default_config="params_v0.1data.txt",
+        default_config="matchmaker_params.ini",
         additional_definitions=infer_params,
     )
     status = run(params)

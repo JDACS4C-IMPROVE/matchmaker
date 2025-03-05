@@ -2,26 +2,6 @@ from improvelib.utils import str2bool
 
 preprocess_params = [
 
-    {"name": "y_data_file",
-     "type": str,
-     "default": "synergy.tsv",
-     "help": "name of y data file",
-    },
-    {"name": "cell_data_file",
-     "type": str,
-     "default": "transcriptomics_L1000.tsv",
-     "help": "name of y data file",
-    },
-    {"name": "drug_data_file",
-     "type": str,
-     "default": "drug_mordred.tsv",
-     "help": "name of y data file",
-    },
-    {"name": "datasets",
-     "type": str,
-     "default": "ALMANAC",
-     "help": "datasets to use -- currently not used",
-    },
 ]
 train_params = [
     {"name": "num_cores",
