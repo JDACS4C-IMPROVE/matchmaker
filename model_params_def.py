@@ -11,7 +11,7 @@ train_params = [
     },
     {"name": "arch",
      "type": str,
-     "default": "matchmaker/architecture.txt",
+     "default": "./architecture.txt",
      "help": "Architecute file to construct MatchMaker layers",
     },
     {"name": "inDrop",
