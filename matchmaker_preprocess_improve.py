@@ -35,7 +35,7 @@ def run(params: Dict):
 
     # Create output dir for model input data (to save preprocessed ML data)
     #frm.create_outdir(outdir=params["ml_data_outdir"])
-
+    print(params)
     # ------------------------------------------------------
     # [Req] Load X data (feature representations)
     # ------------------------------------------------------
