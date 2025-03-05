@@ -7,7 +7,8 @@ import sys
 from pathlib import Path
 from typing import Dict
 # [Req] Core improvelib imports
-from improvelib.applications.drug_response_prediction.config import DRPPreprocessConfig
+from improvelib.applications.synergy.config import SynergyPreprocessConfig
+import improvelib.applications.synergy.synergy_utils as syn
 from improvelib.utils import str2bool
 import improvelib.utils as frm
 # Model-specific imports
@@ -44,29 +45,19 @@ def run(params: Dict):
     # need to make this work for all feature types AND MULTIPLE
     # data file names
     # eventually fix this in improvelib so it checks for a path, and then in the input_dir
-    y_data_fname = params["input_dir"] + "/" + "y_data" + "/" + params["y_data_file"]
-    cell_feature_fname = params["input_dir"] + "/" + "x_data" + "/" + params["cell_data_file"]
-    drug_feature_fname = params["input_dir"] + "/" + "x_data" + "/" + params["drug_data_file"]
-    # split file names
-    train_split_file = params["input_dir"] + "/" + "splits" + "/" + params["train_split_file"]
-    val_split_file = params["input_dir"] + "/" + "splits" + "/" + params["val_split_file"]
-    test_split_file = params["input_dir"] + "/" + "splits" + "/" + params["test_split_file"]
     # read in data
-    y_data = pd.read_csv(y_data_fname, sep="\t")
-    cell_feature = pd.read_csv(cell_feature_fname, sep="\t")
-    cell_feature = cell_feature.set_index('DepMap_ID')
-    drug_feature = pd.read_csv(drug_feature_fname, sep="\t", index_col="DrugID")
-    # drop smiles col from drugs - should be removed from a future version
-    drug_feature.drop(drug_feature.columns[[0]], axis=1, inplace=True)
-    # read in splits
-    train = list(np.loadtxt(train_split_file,dtype=int))
-    val = list(np.loadtxt(val_split_file,dtype=int))
-    test = list(np.loadtxt(test_split_file,dtype=int))
-    y_data = y_data.reset_index(drop=True)
-    y_data["split"] = "NA"
-    y_data.loc[train, "split"] = "train"
-    y_data.loc[val, "split"] = "val"
-    y_data.loc[test, "split"] = "test"
+    y_data = syn.get_all_response_data(train_split_file = params['train_split_file'], 
+                                   val_split_file = params['val_split_file'], 
+                                   test_split_file = params['test_split_file'], 
+                                   benchmark_dir = params['input_dir'])
+    cell_feature = syn.get_cell_transcriptomics(file = params['cell_transcriptomic_file'], 
+                                                  benchmark_dir = params['input_dir'], 
+                                                  cell_column_name = params['cell_column_name'], 
+                                                  norm = params['cell_transcriptomic_transform'])
+    drug_feature = syn.get_drug_mordred(file = params['drug_mordred_file'], 
+                     benchmark_dir = params['input_dir'], 
+                     drug_column_name = params['drug_column_name'])
+
 
     # prefix drug and cell features
     cell_feature = cell_feature.add_prefix("cell_")
@@ -74,9 +65,9 @@ def run(params: Dict):
     drug2_feature = drug_feature.add_prefix("drug2_")
 
     # join all datasets on inner
-    y_cell = y_data.join(cell_feature, on="DepMapID", how="inner")
-    y_cell_d1 = y_cell.join(drug1_feature, on="DrugID.row", how="inner")
-    y_cell_d1_d2 = y_cell_d1.join(drug2_feature, on="DrugID.col", how="inner")
+    y_cell = y_data.join(cell_feature, on=params['cell_column_name'], how="inner")
+    y_cell_d1 = y_cell.join(drug1_feature, on=params['drug_1_column_name'], how="inner")
+    y_cell_d1_d2 = y_cell_d1.join(drug2_feature, on=params['drug_2_column_name'], how="inner")
     y_cell_d1_d2 = y_cell_d1_d2.dropna(subset=[params["y_col_name"]])
     y_cell_d1_d2 = y_cell_d1_d2.reset_index(drop=True)
 
@@ -147,10 +138,10 @@ def run(params: Dict):
 
 # [Req]
 def main(args):
-    cfg = DRPPreprocessConfig()
+    cfg = SynergyPreprocessConfig()
     params = cfg.initialize_parameters(
         pathToModelDir=filepath,
-        default_config="params_v0.1data.txt",
+        default_config="matchmaker_params.ini",
         additional_definitions=preprocess_params)
     ml_data_outdir = run(params)
     print("\nFinished data preprocessing.")
