@@ -75,14 +75,12 @@ def run(params):
     min_s = np.amin(train_data['y'])
     loss_weight = np.log(train_data['y'] - min_s + np.e)
 
-    # load architecture file
-    architecture = pd.read_csv(params["arch"])
-
     # prepare layers of the model and the model name
     layers = {}
-    layers['DSN_1'] = architecture['DSN_1'][0] # layers of Drug Synergy Network 1
-    layers['DSN_2'] = architecture['DSN_2'][0] # layers of Drug Synergy Network 2
-    layers['SPN'] = architecture['SPN'][0] # layers of Synergy Prediction Network
+
+    layers['DSN_1'] = params['DSN_1'] # layers of Drug Synergy Network 1
+    layers['DSN_2'] = params['DSN_1'] # layers of Drug Synergy Network 2
+    layers['SPN'] = params['DSN_1'] # layers of Synergy Prediction Network
 
     model = MatchMaker.generate_network(train_data, layers, params["inDrop"], params["drop"])
 
