@@ -1,0 +1,14 @@
+name: matchmaker
+channels:
+  - bioconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.7
+  - numpy=1.18.1
+  - scipy=1.4.1
+  - pandas=1.0.1
+  - tensorflow-gpu=2.1.0
+  - scikit-learn=0.22.1
+  - keras-metrics=1.1.0
+  - h5py=2.10.0
