@@ -1,8 +1,7 @@
-""" Train Matchmaker for drug response prediction.
+""" Train Matchmaker for synergy prediction.
 """
 import sys
 from pathlib import Path
-from typing import Dict
 # [Req] IMPROVE imports
 from improvelib.applications.synergy.config import SynergyTrainConfig
 import improvelib.utils as frm
@@ -15,7 +14,7 @@ import tensorflow as tf
 import MatchMaker
 import pickle
 import tensorflow.keras as keras
-from model_params_def import train_params
+
 
 filepath = Path(__file__).resolve().parent # [Req]
 
@@ -82,7 +81,7 @@ def run(params):
     layers['DSN_2'] = params['DSN_1'] # layers of Drug Synergy Network 2
     layers['SPN'] = params['DSN_1'] # layers of Synergy Prediction Network
 
-    model = MatchMaker.generate_network(train_data, layers, params["inDrop"], params["drop"])
+    model = MatchMaker.generate_network(train_data, layers, params["inDrop"], params["dropout"])
 
     # -----------------------------
     # Train. Iterate over epochs.
@@ -134,15 +133,17 @@ def run(params):
     return val_scores
 
 
-
 # [Req]
 def main(args):
     cfg = SynergyTrainConfig()
-    params = cfg.initialize_parameters(
-        pathToModelDir=filepath,
-        default_config="matchmaker_params.ini",
-        additional_definitions=train_params)
+    params = cfg.initialize_parameters(pathToModelDir=filepath,
+                                       default_config="matchmaker_params.ini",
+                                       additional_definitions=train_params)
+    timer_train = frm.Timer()
     val_scores = run(params)
+    timer_train.save_timer(dir_to_save=params["output_dir"], 
+                           filename='runtime_train.json', 
+                           extra_dict={"stage": "train"})
     print("\nFinished training model.")
 
 

@@ -1,9 +1,8 @@
-""" Inference with Matchmaker for drug response prediction.
+""" Inference with Matchmaker for synergy prediction.
 """
 
 import sys
 from pathlib import Path
-from typing import Dict
 
 import pandas as pd
 
@@ -106,18 +105,20 @@ def run(params):
         )
 
 
-    return test_scores
+    return True
 
 
 # [Req]
 def main(args):
     cfg = SynergyInferConfig()
-    params = cfg.initialize_parameters(
-        pathToModelDir=filepath,
-        default_config="matchmaker_params.ini",
-        additional_definitions=infer_params,
-    )
+    params = cfg.initialize_parameters(pathToModelDir=filepath,
+                                       default_config="matchmaker_params.ini",
+                                       additional_definitions=infer_params)
+    timer_infer = frm.Timer() 
     status = run(params)
+    timer_infer.save_timer(dir_to_save=params["output_dir"], 
+                           filename='runtime_infer.json', 
+                           extra_dict={"stage": "infer"})
     print("\nFinished model inference.")
 
 
