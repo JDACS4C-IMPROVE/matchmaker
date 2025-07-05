@@ -118,10 +118,11 @@ def run(params: Dict):
             # concat cell to drug for each
             drug1_cell = pd.concat([drug_first_order, cell_both_order], axis=1)
             drug2_cell = pd.concat([drug_second_order, cell_both_order], axis=1)
+            y_alone = pd.concat([data[params['y_col_name']], data[params['y_col_name']]])
             # save to dict
             stage_data['drug1'] = np.array(drug1_cell)
             stage_data['drug2'] = np.array(drug2_cell)
-            stage_data['y'] = data[params['y_col_name']]
+            stage_data['y'] = np.array(y_alone)
         else:
             # pull out cell and drugs data
             drug_1 = data.loc[:, data.columns.str.startswith('drug1_')]
@@ -130,10 +131,11 @@ def run(params: Dict):
             # concat cell to drug for each
             drug1_cell = pd.concat([drug_1, cell], axis=1)
             drug2_cell = pd.concat([drug_2, cell], axis=1)
+            y_alone = data[params['y_col_name']]
             # save to dict
             stage_data['drug1'] = np.array(drug1_cell)
             stage_data['drug2'] = np.array(drug2_cell)
-            stage_data['y'] = data[params['y_col_name']]
+            stage_data['y'] = np.array(y_alone)
         # Save x data
         data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage=stage)
         data_path = params["output_dir"] + "/" + data_fname
