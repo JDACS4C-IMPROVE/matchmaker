@@ -101,8 +101,8 @@ def run(params: Dict):
         drug1_stage = drugs_stage.add_prefix("drug1_")
         drug2_stage = drugs_stage.add_prefix("drug2_")
         data = response_stage.merge(omics_stage, on=params["canc_col_name"], how="inner")
-        data = data.merge(drug1_stage, on=params["drug_1_col_name"], how="inner")
-        data = data.merge(drug2_stage, on=params["drug_2_col_name"], how="inner")
+        data = data.merge(drug1_stage, left_on=params["drug_1_col_name"], right_on=params["drug_col_name"], how="inner")
+        data = data.merge(drug2_stage, left_on=params["drug_2_col_name"], right_on=params["drug_col_name"], how="inner")
 
         print(f"Save {stage} data")
         stage_data = {}
