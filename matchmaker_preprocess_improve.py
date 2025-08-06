@@ -116,12 +116,12 @@ def run(params: Dict):
         if stage == 'train':
             # pull out cell and drugs data
             drug_1 = data.loc[:, data.columns.str.startswith('drug1_')]
-            drug_1 = drug_1.rename(columns = lambda x: x.strip('drug1_'))
+            drug_1 = drug_1.columns.str.removeprefix('drug1_')
             print("shape drug_1:", drug_1.shape)
             print("columns drug_1:", drug_1.columns)
             print("dtypes drug_1", drug_1.dtypes)
             drug_2 = data.loc[:, data.columns.str.startswith('drug2_')]
-            drug_2 = drug_2.rename(columns = lambda x: x.strip('drug2_'))
+            drug_2 = drug_2.columns.str.removeprefix('drug2_')
             print("shape drug_2:", drug_2.shape)
             print("columns drug_2:", drug_2.columns)
             print("dtypes drug_2", drug_2.dtypes)
