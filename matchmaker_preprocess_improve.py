@@ -109,9 +109,9 @@ def run(params: Dict):
         if stage == 'train':
             # pull out cell and drugs data
             drug_1 = data.loc[:, data.columns.str.startswith('drug1_')]
-            drug_1.rename(columns = lambda x: x.strip('drug1_'))
+            drug_1 = drug_1.rename(columns = lambda x: x.strip('drug1_'))
             drug_2 = data.loc[:, data.columns.str.startswith('drug2_')]
-            drug_2.rename(columns = lambda x: x.strip('drug2_'))
+            drug_2 = drug_2.rename(columns = lambda x: x.strip('drug2_'))
             cell = data.loc[:, data.columns.str.startswith('cell_')]
             # training data for matchmaker is done twice, drug1-drug2 and drug2-drug1
             drug_first_order = pd.concat([drug_1, drug_2])
@@ -128,9 +128,9 @@ def run(params: Dict):
         else:
             # pull out cell and drugs data
             drug_1 = data.loc[:, data.columns.str.startswith('drug1_')]
-            drug_1.rename(columns = lambda x: x.strip('drug1_'))
+            drug_1 = drug_1.rename(columns = lambda x: x.strip('drug1_'))
             drug_2 = data.loc[:, data.columns.str.startswith('drug2_')]
-            drug_2.rename(columns = lambda x: x.strip('drug2_'))
+            drug_2 = drug_2.rename(columns = lambda x: x.strip('drug2_'))
             cell = data.loc[:, data.columns.str.startswith('cell_')]
             # concat cell to drug for each
             drug1_cell = pd.concat([drug_1, cell], axis=1)
