@@ -38,6 +38,7 @@ def run(params: Dict):
     drug_feature = frm.get_x_data(file = params['drug_mordred_file'], 
                     benchmark_dir = params['input_dir'], 
                     column_name = params['drug_col_name'])
+    print("original column names:", drug_feature.columns)
 
     # ------------------------------------------------------
     # [Req] Validity check of feature representations
@@ -61,7 +62,9 @@ def run(params: Dict):
     drug1_train = frm.get_features_in_y_data(drug_feature, response_train, params['drug_1_col_name'])
     drug2_train = frm.get_features_in_y_data(drug_feature, response_train, params['drug_2_col_name'])
     drugs_train = pd.concat([drug1_train, drug2_train]).drop_duplicates()
-
+    print("columns drug_1 before det transform:", drug1_train.columns)
+    print("columns drug_2 before det transform:", drug2_train.columns)
+    print("columns drugs before det transform:", drugs_train.columns)
     print("Determine transformations.")
     frm.determine_transform(omics_train, 'omics_transform', params['cell_transcriptomic_transform'], params['output_dir'])
     frm.determine_transform(drugs_train, 'drugs_transform', params['drug_mordred_transform'], params['output_dir'])
