@@ -136,6 +136,10 @@ def run(params: Dict):
             stage_data['drug1'] = np.array(drug1_cell)
             stage_data['drug2'] = np.array(drug2_cell)
             stage_data['y'] = np.array(y_alone)
+        print(f"___ STAGE {stage} ____")
+        print("stage_data['drug1'].shape:", stage_data['drug1'].shape)
+        print("stage_data['drug2'].shape:", stage_data['drug2'].shape)
+        print("stage_data['y'].shape:", stage_data['y'].shape)
         # Save x data
         data_fname = frm.build_ml_data_file_name(data_format=params["data_format"], stage=stage)
         data_path = params["output_dir"] + "/" + data_fname
@@ -144,7 +148,7 @@ def run(params: Dict):
         # [Req] Save y dataframe for the current stage
         ydf = data[y_df_cols]
         frm.save_stage_ydf(ydf, stage, params["output_dir"])
-
+    print(f"Training data here was {params["train_split_file"]}")
     return params["output_dir"]
 
 
