@@ -38,7 +38,6 @@ def run(params: Dict):
     drug_feature = frm.get_x_data(file = params['drug_mordred_file'], 
                     benchmark_dir = params['input_dir'], 
                     column_name = params['drug_col_name'])
-    print("original column names:", drug_feature.columns)
 
     # ------------------------------------------------------
     # [Req] Validity check of feature representations
@@ -62,9 +61,6 @@ def run(params: Dict):
     drug1_train = frm.get_features_in_y_data(drug_feature, response_train, params['drug_1_col_name'])
     drug2_train = frm.get_features_in_y_data(drug_feature, response_train, params['drug_2_col_name'])
     drugs_train = pd.concat([drug1_train, drug2_train]).drop_duplicates()
-    print("columns drug_1 before det transform:", drug1_train.columns)
-    print("columns drug_2 before det transform:", drug2_train.columns)
-    print("columns drugs before det transform:", drugs_train.columns)
     print("Determine transformations.")
     frm.determine_transform(omics_train, 'omics_transform', params['cell_transcriptomic_transform'], params['output_dir'])
     frm.determine_transform(drugs_train, 'drugs_transform', params['drug_mordred_transform'], params['output_dir'])
@@ -92,9 +88,6 @@ def run(params: Dict):
         drug1_stage = frm.get_features_in_y_data(drug_feature, response_stage, params['drug_1_col_name'])
         drug2_stage = frm.get_features_in_y_data(drug_feature, response_stage, params['drug_2_col_name'])
         drugs_stage = pd.concat([drug1_stage, drug2_stage]).drop_duplicates()
-        print("columns drug_1 before transform:", drug1_stage.columns)
-        print("columns drug_2 before transform:", drug2_stage.columns)
-        print("columns drugs before transform:", drugs_stage.columns)
         print(f"Transform {stage} data.")
         omics_stage = frm.transform_data(omics_stage, 'omics_transform', params['output_dir'])
         drugs_stage = frm.transform_data(drugs_stage, 'drugs_transform', params['output_dir'])
@@ -105,8 +98,6 @@ def run(params: Dict):
         omics_stage = omics_stage.add_prefix("cell_")
         drug1_stage = drugs_stage.add_prefix("drug1_")
         drug2_stage = drugs_stage.add_prefix("drug2_")
-        print("columns drug_1 after add prefix:", drug1_stage.columns)
-        print("columns drug_2 after add prefix:", drug2_stage.columns)
         data = response_stage.merge(omics_stage, on=params["canc_col_name"], how="inner")
         data = data.merge(drug1_stage, left_on=params["drug_1_col_name"], right_on=params["drug_col_name"], how="inner")
         data = data.merge(drug2_stage, left_on=params["drug_2_col_name"], right_on=params["drug_col_name"], how="inner")
@@ -117,14 +108,8 @@ def run(params: Dict):
             # pull out cell and drugs data
             drug_1 = data.loc[:, data.columns.str.startswith('drug1_')]
             drug_1.columns = drug_1.columns.str.lstrip('drug1_')
-            print("shape drug_1:", drug_1.shape)
-            print("columns drug_1:", drug_1.columns)
-            print("dtypes drug_1", drug_1.dtypes)
             drug_2 = data.loc[:, data.columns.str.startswith('drug2_')]
             drug_2.columns = drug_2.columns.str.lstrip('drug2_')
-            print("shape drug_2:", drug_2.shape)
-            print("columns drug_2:", drug_2.columns)
-            print("dtypes drug_2", drug_2.dtypes)
             cell = data.loc[:, data.columns.str.startswith('cell_')]
             # training data for matchmaker is done twice, drug1-drug2 and drug2-drug1
             drug_first_order = pd.concat([drug_1, drug_2])
