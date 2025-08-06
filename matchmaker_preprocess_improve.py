@@ -148,7 +148,7 @@ def run(params: Dict):
         # [Req] Save y dataframe for the current stage
         ydf = data[y_df_cols]
         frm.save_stage_ydf(ydf, stage, params["output_dir"])
-    print(f"Training data here was {params["train_split_file"]}")
+    print(f"Training data here was {params['train_split_file']}")
     return params["output_dir"]
 
 
